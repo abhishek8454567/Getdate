@@ -1,0 +1,230 @@
+/*Html Code*/
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+<input type="date" placeholder="dateofbirth" id="txtid_of_input" />
+<input type="text" placeholder="no of days" id="txt_days" />
+<button id="txtdobsubmit">Submit</button>
+<div id="txt_data"></div>
+
+
+/*Jquery Code*/
+<script>
+    $(document).ready(function () {
+        $("#txtdobsubmit").click(function () {
+            var _id_dob = $("#txtid_of_input").val();
+            var _id_dob_day = $("#txt_days").val();
+            $("#txtid_of_input").next("span").remove();
+            console.log(_id_dob);
+            if (_id_dob === '') {
+                var errorMessage = $("<span>").text("Please enter the UserName").css('color', 'Red');
+                $("#txtid_of_input").after(errorMessage);
+                return false;
+            }
+            if (true) {
+                $.ajax({
+                    type: "POST",
+                    url: '/Home/calculationofdate?date=' + _id_dob + "&Day=" + _id_dob_day,
+                    success: function (result) {
+                        $("#txt_data").empty();
+                        $("#txt_data").append(result.message);
+                    }
+                });
+            }
+        });
+    });
+
+    var _id_dob2 = document.getElementById('txtid_of_input');
+    _id_dob2.addEventListener("keyup", function () {
+        var _id_dob = $("#txtid_of_input").val();
+        $("#txtid_of_input").next("span").remove();
+        if (_id_dob != '') {
+
+        }
+        else {
+            var errorMessage = $("<span>").text("Please enter the UserName").css('color', 'Red');
+            $("#txtid_of_input").after(errorMessage);
+            return false;
+        }
+    });
+</script>
+/*Controller*/
+ public IActionResult calculationofdate(string date,int Day)
+        {
+            string[] dateformate = date.Split("-");
+            string dayss = dateformate[2];
+            string month = dateformate[1];
+            string year = dateformate[0];
+            int month2 = 0;
+            string name_month = insertintmonth(Convert.ToInt32(month), Convert.ToInt32(year));
+            string[] name_months = name_month.Split("-");
+            int z = Convert.ToInt32(name_months[1]) - Convert.ToInt32(dayss);
+            int y = Day - z;
+            if (y > 0)
+            {
+                // Calculate new date here
+                int i = 0;
+                // While loop to handle remaining days
+                while (y > 0)
+                {
+                    
+                    // Adjust month and year if necessary
+                    if (i == 0)
+                    {
+                         month2 = Convert.ToInt32(month) + 1;
+                    }
+                    else
+                    {
+                        month2 = month2 + 1;
+                    }
+                    
+                    if (month2 > 12)
+                    {
+                        month2 = 1; // Reset month to January
+                        year = (Convert.ToInt32(year) + 1).ToString(); // Increment year
+                    }
+
+                    // Calculate new month's total days
+                    string name_month_1 = insertintmonth(month2, Convert.ToInt32(year));
+                    string[] name_monthss = name_month_1.Split("-");
+                    int daysInMonth = Convert.ToInt32(name_monthss[1]);
+
+                    // Adjust remaining days and month
+                    y -= daysInMonth;
+                    if (y <= 0)
+                    {
+                        // Set new day and month values
+                        Day = daysInMonth + y;
+                        month = month2.ToString();
+                    }
+                    i++;
+                }
+            }
+            else
+            {
+                // Set new day value
+                Day = Convert.ToInt32(dayss) + Day;
+            }
+
+            // Construct the new date string
+            string newDate = $"{Day}-{insertintmonth_string(Convert.ToInt32(month))}-{year}";
+            return Ok(new { message = newDate });
+           
+        }
+        public static string insertintmonth(int month,int year)
+        {
+            string monthname = "";
+            bool isLeapYear = (year % 4 == 0 && year % 100 != 0) || (year % 400 == 0);
+
+
+            if (month == 1)
+            {
+                monthname = "Jan-31";
+            }
+           else if(month == 2)
+            {
+                if(isLeapYear)
+                {
+                    monthname = "Feb-29";
+                }
+                else
+                {
+                    monthname = "Feb-28";
+                }
+            }
+            else if(month == 3)
+            {
+                monthname = "Mar-31";
+            }
+            else if(month == 4)
+            {
+                monthname = "Apr-30";
+            }
+            else if(month == 5)
+            {
+                monthname = "May-31";
+            }
+            else if(month == 6)
+            {
+                monthname = "Jun-30";
+            }
+            else if(month ==  7)
+            {
+                monthname = "Jul-31";
+            }
+            else if(month == 8)
+            {
+                monthname = "Aug-31";
+            }
+            else if(month == 9)
+            {
+                monthname = "Sep-30";
+            }
+            else if(month == 10)
+            {
+                monthname = "Oct-31";
+            }
+            else if(month == 11)
+            {
+                monthname = "Nov-30";
+            }
+            else if(month == 12)
+            {
+                monthname = "Dec-31";
+            }
+            return monthname;
+        }
+        public static string insertintmonth_string(int month)
+        {
+            string monthname = "";
+
+            if (month == 1)
+            {
+                monthname = "Jan";
+            }
+           else if(month == 2)
+            {
+                    monthname = "Feb";
+               
+            }
+            else if(month == 3)
+            {
+                monthname = "Mar";
+            }
+            else if(month == 4)
+            {
+                monthname = "Apr";
+            }
+            else if(month == 5)
+            {
+                monthname = "May";
+            }
+            else if(month == 6)
+            {
+                monthname = "Jun";
+            }
+            else if(month ==  7)
+            {
+                monthname = "Jul";
+            }
+            else if(month == 8)
+            {
+                monthname = "Aug";
+            }
+            else if(month == 9)
+            {
+                monthname = "Sep";
+            }
+            else if(month == 10)
+            {
+                monthname = "Oct";
+            }
+            else if(month == 11)
+            {
+                monthname = "Nov";
+            }
+            else if(month == 12)
+            {
+                monthname = "Dec";
+            }
+            return monthname;
+        }
